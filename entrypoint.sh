@@ -112,21 +112,35 @@ prepare_liferay_portal_properties() {
 }
 
 prepare_liferay_tomcat_config() {
-  if [[ ! -f "$LIFERAY_CONFIG_DIR/setenv.sh" ]]; then
-    echo "No 'configs/setenv.sh' file found.
-  If you wish to provide custom tomcat JVM settings, make sure
-  you include a 'configs/setenv.sh' file in the 
-  root of your project.
+  if [[ ! -d "$LIFERAY_CONFIG_DIR/tomcat" ]]; then
+    echo "No Tomcat config files found.
+  If you wish to provide custom JVM settings, Thread Pools, and other tuning
+  make sure to include custom Tomcat setenv.sh, server.xml or web.xml files
+  in the root of configs directory.
 
   Continuing.
   "
     return 0
   fi
 
-  echo "Tomcat configuration (setenv.sh) file found.
+  echo "Tomcat Configuration directory found.
+  The following contents are going to be synchronized
+  with Liferay:
   "
 
-  cp -r $LIFERAY_CONFIG_DIR/setenv.sh $CATALINA_HOME/bin/setenv.sh
+  tree $LIFERAY_CONFIG_DIR/tomcat
+
+  if [[ -f "$LIFERAY_CONFIG_DIR/tomcat/setenv.sh" ]]; then
+    cp -r $LIFERAY_CONFIG_DIR/tomcat/setenv.sh $CATALINA_HOME/bin/setenv.sh
+  fi
+
+  if [[ -f "$LIFERAY_CONFIG_DIR/tomcat/server.xml" ]]; then
+    cp -r $LIFERAY_CONFIG_DIR/tomcat/server.xml $CATALINA_HOME/conf/server.xml
+  fi
+
+  if [[ -f "$LIFERAY_CONFIG_DIR/tomcat/web.xml" ]]; then
+    cp -r $LIFERAY_CONFIG_DIR/tomcat/web.xml $CATALINA_HOME/conf/web.xml
+  fi
 
   echo "
   Continuing.
